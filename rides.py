@@ -4,6 +4,12 @@
 # Indiana Wing CAF
 # Jim Olivi 2024
 
+import time
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from jinja2 import Environment, FileSystemLoader
+import os
+
 import pandas as pd
 import smtplib
 
@@ -11,86 +17,60 @@ import smtplib
 class Rides:
     def __init__(self, database):
 
-        smtp_server = 'sandbox.smtp.mailtrap.io'
-        port = 2525
-        login = '6f5e80fce2ea00'
-        password = 'c26f1d3a41d801'
-
         print('Enter Rides Class Initializer')
 
         print('Data contained in: ' + database)
 
-        message_HH_done = '''
-Indiana Wing 
-Commemorative Air Force
+# --** Begin SMTP - Jinja2 Mail Merge
+        env = Environment(loader=FileSystemLoader('%s/templates' % os.path.dirname(__file__)))
+# --***************************************************
 
-
-
-Dear {purchaser},
-
-Thank you for purchasing a ride in the {airplane}  on {date_of_flight}. It will be an exciting ride on a genuine World War 2 warbird. Please arrive at {airport} at least one hour before your flight to get prepared and to complete any leftover paperwork. 
-
-Dress comfortably. There are canopies on the airplane, but it will be breezy. Long pants are recommended. Closed toe shoes are required (no sandals). We will provide a headset so that you can hear the pilot communicate with other air traffic and for you to talk to the pilot. You can bring your own aviation headset, if you want.
-
-If you have any questions, do not hesitate to call me at 317-584-7852.
-
-Col. Jim Olivi
-Indiana Wing, Commemorative Air Force
-Rides Coordinator
-317-584-7852
-rides@indianawingcaf.org
-        '''
-
-        message_needs_HH = '''
-Indiana Wing 
-Commemorative Air Force
-
-
-
-Dear {purchaser},
-
-Thank you for purchasing a ride in the {airplane}  on {date_of_flight}. It will be an exciting ride on a genuine World War 2 warbird. Please arrive at {airport} at least one hour before your flight to get prepared and to complete any leftover paperwork. 
-
-Dress comfortably. There are canopies on the airplane, but it will be breezy. Long pants are recommended. Closed toe shoes are required (no sandals). We will provide a headset so that you can hear the pilot communicate with other air traffic and for you to talk to the pilot. You can bring your own aviation headset, if you want.
-
-Please click this link https://cafhq.formstack.com/forms/hh_master to fill out the required Commemorative Air Force form. This will save time at the airport.
-
-If you have any questions, do not hesitate to call me at 317-584-7852.
-
-Col. Jim Olivi
-Indiana Wing, Commemorative Air Force
-Rides Coordinator
-317-584-7852
-rides@indianawingcaf.org
-                '''
+        rides_email = os.environ.get('INDYCAF_EMAIL_ADDRESS')
+        print(rides_email)
+        rides_password = os.environ.get('RIDES_PASSWORD')
+        print(rides_password)
+        if rides_email is None or rides_password is None:
+            raise ValueError('From email address or password not specified.')
 
         try:
             customer_df = pd.read_csv(database)
         except FileNotFoundError:
             print('Pandas file not found: ' + database)
         except:
-            print('Pandas file error.')
+            print('Pandas file error: ' + database)
         else:
             print('Database Read Successful')
-            with smtplib.SMTP(smtp_server, port) as server:
-                server.login(login, password)
-                for r in customer_df.itertuples():
-                    purchaser = r[1] + ' ' + r[2]
-                    email = r[3]
-                    airplane = r[4]
-                    date_of_flight = r[5]
-                    HH_Needed = r[6]
-                    if HH_Needed == 'y':
-                        message = message_needs_HH
-                    else:
-                        message = message_HH_done
 
-                    server.sendmail(
-                        'test-center@example.com',
-                        email,
-                        message.format(purchaser=purchaser, recipient=email, airplane=airplane, date_of_flight=date_of_flight, airport='Zionsville')
-                    )
-                    print(f'Confirmation sent to {purchaser}')
-
-
-
+# --** Start mailtrap code
+#             with smtplib.SMTP('sandbox.smtp.mailtrap.io', 2525) as server:
+#                 server.starttls()
+#                 server.login('', '')
+# --****************************
+            smtp_server = 'smtp.zoho.com'
+            smtp_port = 465
+            server = smtplib.SMTP_SSL(smtp_server, smtp_port)
+            server.login(rides_email, rides_password)
+            template = env.get_template('Confirm_Without_Hold_Harmless.html')
+            for customer in customer_df.itertuples():
+                message = MIMEMultipart()
+                message['Subject'] = 'Your upcoming Warbird Ride.'
+                purchaser = customer[1] + ' ' + customer[2]
+                if customer[6] == 'y':
+                    HH = True
+                else:
+                    HH = False
+                message_html = template.render(purchaser=purchaser, airplane=customer[4], airport=customer[7], hold_harmless=HH, date_of_flight=customer[5])
+                message.attach((MIMEText(message_html, 'html')))
+                try:
+                    server.sendmail(rides_email, customer[3], message.as_string())
+                except Exception as error:
+                    print(f'Sendmail failed: {error}')
+# --** Start mailtrap code
+#                 server.sendmail(
+#                     'test-center@example.com',
+#                     customer[3],
+#                     message
+#                 )
+# --*************************************************8
+                print(f'Confirmation sent to {purchaser}')
+            server.quit()
