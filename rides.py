@@ -21,14 +21,12 @@ class Rides:
 
         print('Data contained in: ' + database)
 
-# --** Begin SMTP - Jinja2 Mail Merge
+        # --** Begin SMTP - Jinja2 Mail Merge
         env = Environment(loader=FileSystemLoader('%s/templates' % os.path.dirname(__file__)))
-# --***************************************************
+        # --***************************************************
 
         rides_email = os.environ.get('INDYCAF_EMAIL_ADDRESS')
-        print(rides_email)
         rides_password = os.environ.get('RIDES_PASSWORD')
-        print(rides_password)
         if rides_email is None or rides_password is None:
             raise ValueError('From email address or password not specified.')
 
@@ -41,11 +39,11 @@ class Rides:
         else:
             print('Database Read Successful')
 
-# --** Start mailtrap code
-#             with smtplib.SMTP('sandbox.smtp.mailtrap.io', 2525) as server:
-#                 server.starttls()
-#                 server.login('', '')
-# --****************************
+            # --** Start mailtrap code
+            #             with smtplib.SMTP('sandbox.smtp.mailtrap.io', 2525) as server:
+            #                 server.starttls()
+            #                 server.login('', '')
+            # --****************************
             smtp_server = 'smtp.zoho.com'
             smtp_port = 465
             server = smtplib.SMTP_SSL(smtp_server, smtp_port)
@@ -55,22 +53,27 @@ class Rides:
                 message = MIMEMultipart()
                 message['Subject'] = 'Your upcoming Warbird Ride.'
                 purchaser = customer[1] + ' ' + customer[2]
-                if customer[6] == 'y':
+                if customer[7] == 'y':
+                    print('HH Done')
                     HH = True
+                    amount = ''
                 else:
+                    print('Needs HH.')
                     HH = False
-                message_html = template.render(purchaser=purchaser, airplane=customer[4], airport=customer[7], hold_harmless=HH, date_of_flight=customer[5])
+                    amount = customer[6]
+                message_html = template.render(purchaser=purchaser, airplane=customer[4], airport=customer[8],
+                                               hold_harmless=HH, date_of_flight=customer[5], mount=amount)
                 message.attach((MIMEText(message_html, 'html')))
                 try:
                     server.sendmail(rides_email, customer[3], message.as_string())
                 except Exception as error:
                     print(f'Sendmail failed: {error}')
-# --** Start mailtrap code
-#                 server.sendmail(
-#                     'test-center@example.com',
-#                     customer[3],
-#                     message
-#                 )
-# --*************************************************8
+                # --** Start mailtrap code
+                #                 server.sendmail(
+                #                     'test-center@example.com',
+                #                     customer[3],
+                #                     message
+                #                 )
+                # --*************************************************8
                 print(f'Confirmation sent to {purchaser}')
             server.quit()

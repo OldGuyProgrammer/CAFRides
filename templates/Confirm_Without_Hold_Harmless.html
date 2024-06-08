@@ -2,29 +2,47 @@
 <html lang="en-US">
 <head>
     <title>Title</title>
-    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width"/>
 </head>
 <body>
-<p>Indiana Wing</p>
-<p>Commemorative Air Force</p>
 <br>
+<br>
+<span>Indiana Wing</span><br>
+<span>Commemorative Air Force</span><br>
+<div id="current_date">
+    <script>
+        date = new Date()
+        year = date.getFullYear()
+        month = date.getMonth()
+        day = date.getDay()
+        document.getElementById("current_date").innerHTML = month + "/" + day + "/" + year
+    </script>
+</div>
 <p>Dear {{ purchaser }},</p>
-<br>
-<p>Thank you for purchasing a ride in the {{ airplane }} on {{ date_of_flight }}. It will be an exciting ride on a genuine World War II warbird. Please arrive at {{airport}} at least one hour before your flight to get prepared and to complete any leftover paperwork.</p>
-<br>
-<p>Dress comfortably. There are canopies on the airplane, but it will be breezy. Long pants are recommended. Closed toe shoes are required (no sandals). We will provide a headset so that you can hear the pilot communicate with other air traffic and for you to talk to the pilot. You can bring your own aviation headset, if you want.</p>
-<br>
-{%if not hold_harmless %}
-<p>Please click this link https://cafhq.formstack.com/forms/hh_master to fill out the required Commemorative Air Force form. This will save time at the airport.</p>
-<br>
+<p>Thank you for purchasing a ride in the {{ airplane }} on {{ date_of_flight }}. It will be an exciting ride on a
+    genuine World War II Warbird. Please arrive at {{airport}} at least one hour before your flight to get prepared and
+    to complete any leftover paperwork.</p>
+<p>Dress comfortably. There are canopies on the airplane, but it will be breezy. Long pants are recommended. Closed toe
+    shoes are required (no sandals). We will provide a headset so that you can hear the pilot communicate with other air
+    traffic and for you to talk to the pilot. You can bring your own aviation headset, if you want.</p>
+
+{% if not hold_harmless %}
+
+<div id="holdHarmlessSection">
+    <span>
+        Please click this link <a href='https://cafhq.formstack.com/forms/hh_master?&caf_hold_harmless=&signee_information=Adult+Rider+(ages+18+and+up)&which_unit=Indiana+Wing&Dollar+Amount+of+Total+Purchase={{ amount }}'>CAF Hold Harmless</a>
+        to complete necessary CAF paperwork. This will save time at the airport.</span>
+    </span>
+</div>
+
 {% endif %}
+
 <p>If you have any questions, do not hesitate to call me at 317-584-7852.</p>
-<br>
-<p>Col. Jim Olivi</p>
-<p>Indiana Wing, Commemorative Air Force</p>
-<p>Rides Coordinator</p>
-<p>317-584-7852</p>
-<p>rides@indianawingcaf.org</p>
+<span>Col. Jim Olivi</span><br>
+<span>Indiana Wing, Commemorative Air Force</span><br>
+<span>Rides Coordinator</span><br>
+<span>317-584-7852</span><br>
+<span>rides@indianawingcaf.org</span>
 </body>
 </html>
