@@ -1,7 +1,7 @@
-<!doctype html>
-<html lang="en-US">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1-/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title>Title</title>
+    <title>Indiana Wing Ride Confirmation</title>
     <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"/>
     <meta name="viewport" content="width=device-width"/>
 </head>
@@ -10,15 +10,7 @@
 <br>
 <span>Indiana Wing</span><br>
 <span>Commemorative Air Force</span><br>
-<div id="current_date">
-    <script>
-        date = new Date()
-        year = date.getFullYear()
-        month = date.getMonth()
-        day = date.getDay()
-        document.getElementById("current_date").innerHTML = month + "/" + day + "/" + year
-    </script>
-</div>
+{{ date }}
 <p>Dear {{ purchaser }},</p>
 <p>Thank you for purchasing a ride in the {{ airplane }} on {{ date_of_flight }}. It will be an exciting ride on a
     genuine World War II Warbird. Please arrive at {{airport}} at least one hour before your flight to get prepared and
@@ -30,10 +22,7 @@
 {% if not hold_harmless %}
 
 <div id="holdHarmlessSection">
-    <span>
-        Please click this link <a href='https://cafhq.formstack.com/forms/hh_master?&caf_hold_harmless=&signee_information=Adult+Rider+(ages+18+and+up)&which_unit=Indiana+Wing&Dollar+Amount+of+Total+Purchase={{ amount }}'>CAF Hold Harmless</a>
-        to complete necessary CAF paperwork. This will save time at the airport.</span>
-    </span>
+    {{ HH_text}}
 </div>
 
 {% endif %}
