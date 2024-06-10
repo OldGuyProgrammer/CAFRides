@@ -12,6 +12,7 @@ import os
 
 import pandas as pd
 import smtplib
+from smtplib import SMTPException
 
 from app import App
 
@@ -44,21 +45,25 @@ class Rides:
             print('Pandas file error: ' + database)
         else:
             # --** Start mailtrap code
-            print('Send to Mailtrap')
-            server = smtplib.SMTP('sandbox.smtp.mailtrap.io', 2525)
-            server.starttls()
-            id = os.environ.get('MAILTRAP_ID')
-            password = os.environ.get('MAILTRAP_PASSWORD')
-            try:
-                server.login(id, password)
-            except:
-                print('Mailtrap login failed')
+            # print('Send to Mailtrap')
+            # server = smtplib.SMTP('sandbox.smtp.mailtrap.io', 2525)
+            # server.starttls()
+            # id = os.environ.get('MAILTRAP_ID')
+            # password = os.environ.get('MAILTRAP_PASSWORD')
+            # try:
+            #     server.login(id, password)
+            # except:
+            #     print('Mailtrap login failed')
             # --****************************
-            # --** Start Zoho Code
-            # smtp_server = 'smtp.zoho.com'
-            # smtp_port = 465
-            # server = smtplib.SMTP_SSL(smtp_server, smtp_port)
-            # server.login(rides_email, rides_password)
+            #--** Start Zoho Code
+            try:
+                print('Send from Zoho.')
+                smtp_server = 'smtp.zoho.com'
+                smtp_port = 465
+                server = smtplib.SMTP_SSL(smtp_server, smtp_port)
+                server.login(rides_email, rides_password)
+            except SMTPException as error:
+                raise ReferenceError('SMTP error: ' + str(error))
             # --***************************************
             template = env.get_template('Confirm_Without_Hold_Harmless.html')
             now = datetime.datetime.now()
@@ -67,12 +72,13 @@ class Rides:
                 message = MIMEMultipart()
                 subject = 'Your upcoming Warbird Ride.'
                 message['Subject'] = subject
+                message['From'] = rides_email
                 to_email = customer[3]
+                message['To'] = to_email
                 purchaser = customer[1] + ' ' + customer[2]
                 amount = str(customer[6])
                 HH_text = ''
                 if customer[7] == 'y':
-                    print('HH Done')
                     HH = True
                     amount = ''
                 else:
@@ -82,7 +88,9 @@ class Rides:
                     HH_text += '&which_unit=Indiana+Wing'
                     HH_text += '&Dollar+Amount+of+Total+Purchase='
                     HH_text += amount
-                    HH_text += '&Which+Aircraft=AT6+/+SNJ+/+Harvard>'
+                    HH_text += '&which+aircraft='
+                    hh_aircraft = app.get_aircraft(customer[4]).replace(' ', '+')
+                    HH_text += hh_aircraft + '>'
                     HH_text += 'CAF Hold Harmless</a> '
                     HH_text += 'to complete necessary CAF paperwork. This will save time at the airport.'
                     HH = False
@@ -92,18 +100,19 @@ class Rides:
                 message.attach((MIMEText(message_html, 'html')))
                 try:
                     # --** Start mailtrap code
-                    message = MIMEText(message_html, "html")
-                    message["Subject"] = subject
-                    message["From"] = rides_email
-                    message['To'] = to_email
-                    server.sendmail(
-                        rides_email,
-                        to_email,
-                        message.as_string()
-                    )
+                    # message = MIMEText(message_html, "html")
+                    # message["Subject"] = subject
+                    # message["From"] = rides_email
+                    # message['To'] = to_email
+                    # server.sendmail(
+                    #     rides_email,
+                    #     to_email,
+                    #     message.as_string()
+                    # )
                     # --*************************************************8
+
                     # --** Zoho server send
-                    # server.sendmail(rides_email, to_email, message.as_string())
+                    server.sendmail(rides_email, to_email, message.as_string())
                 except Exception as error:
                     print(f'Sendmail failed: {error}')
 

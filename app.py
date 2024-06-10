@@ -8,12 +8,16 @@ import pandas as pd
 
 class App:
     def __init__(self):
-        aircraft_file_name = 'aircraft.json'
+        aircraft_file_name = 'aircraft.csv'
         try:
-            self.aircraft_df = pd.read_json(aircraft_file_name, orient='index')
+            self.aircraft_df = pd.read_csv(aircraft_file_name)
         except FileNotFoundError:
             raise FileNotFoundError('Pandas file not found: ' + aircraft_file_name)
         except:
             raise ReferenceError('Pandas file error: ' + aircraft_file_name)
         else:
             pass
+
+    def get_aircraft(self, aircraft):
+        hh_designator = self.aircraft_df.loc[self.aircraft_df['Aircraft'] == aircraft]['HH_Designation'].values[0]
+        return hh_designator
