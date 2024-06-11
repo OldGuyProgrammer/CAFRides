@@ -16,19 +16,17 @@ if __name__ == '__main__':
     print('Start email generator')
 
     parser = argparse.ArgumentParser(description='Send confirmation emails to Rides customers based on .csv file listing names.')
-    parser.add_argument('-p', '--production', default=False, action='store_false',
+    parser.add_argument('-id', '--userid',
+                        help='UserID - for production use the sender"s email address, for testing use the mailtrap account number.')
+    parser.add_argument('-pw','--password',
+                        help='Password.')
+    parser.add_argument('-p', '--production', action='store_true',
                         help='Run program in production mode. Test mode will send emails to mailtrap.')
-    parser.add_argument('id',
-                        help='UserID - Not needed if added to environment variables. Overrides environment variable if entered.')
-    parser.add_argument('password',
-                        help='Password - Not needed if added to environment variables. Overrides environment variable if entered.')
 
     args = parser.parse_args()
     App.production = args.production
-    App.UserId = args.id
-    print(App.UserId)
+    App.UserId = args.userid
     App.password = args.password
-    print(App.password)
 
     if App.production:
         print('Production mode selected.')

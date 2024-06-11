@@ -30,21 +30,8 @@ def rides(database):
     env = Environment(loader=FileSystemLoader('%s/templates' % os.path.dirname(__file__)))
     # --***************************************************
 
-    if App.UserId == '':
-        if App.production:
-            rides_id = os.environ.get('INDYCAF_EMAIL_ADDRESS')
-        else:
-            rides_id = os.environ.get('MAILTRAP_ID')
-    else:
-        rides_id = App.UserId
-
-    if not App.password:
-        if App.production:
-            rides_password = os.environ.get('RIDES_PASSWORD')
-        else:
-            rides_password = os.environ.get('MAILTRAP_PASSWORD')
-    else:
-        rides_password = App.password
+    rides_id = App.UserId
+    rides_password = App.password
 
     if rides_id is None or rides_password is None:
         raise ValueError('From email address or password not specified.')
@@ -73,7 +60,7 @@ def rides(database):
                 smtp_server = 'smtp.zoho.com'
                 smtp_port = 465
                 server = smtplib.SMTP_SSL(smtp_server, smtp_port)
-                server.login(rides_email, rides_password)
+                server.login(str(rides_id), str(rides_password))
             except SMTPException as error:
                 raise ReferenceError('SMTP error: ' + str(error))
         # --***************************************
