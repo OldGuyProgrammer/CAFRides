@@ -7,6 +7,8 @@
 import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from time import sleep
+
 from jinja2 import Environment, FileSystemLoader
 import os
 
@@ -38,6 +40,7 @@ def rides(database):
 
     try:
         customer_df = pd.read_csv(database)
+        customer_df = customer_df.drop(customer_df[customer_df.Send_Email == 'n'].index)
     except FileNotFoundError:
         print('Pandas file not found: ' + database)
     except:
@@ -96,7 +99,7 @@ def rides(database):
 
             message_html = template.render(date=letter_date, purchaser=purchaser, airplane=customer[4],
                                            airport=customer[8],
-                                           hold_harmless=HH, date_of_flight=customer[5], HH_text=HH_text)
+                                           hold_harmless=HH, date_of_flight=customer[5])
             message.attach((MIMEText(message_html, 'html')))
             try:
                 if not App.production:
@@ -118,4 +121,5 @@ def rides(database):
                 print(f'Sendmail failed: {error}')
 
             print(f'Confirmation sent to {purchaser}')
+            sleep(1)
         server.quit()
