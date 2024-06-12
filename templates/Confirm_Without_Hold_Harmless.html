@@ -15,21 +15,11 @@
 <p>Dear {{ purchaser }},</p>
 <p>Thank you for purchasing a ride in the {{ airplane }} on {{ date_of_flight }}. It will be an exciting ride on a
     genuine World War II Warbird. Please arrive at {{airport}} at least one hour before your flight to get prepared and
-    to complete any leftover paperwork.</p>
+    to complete the paperwork. If the rider is between the ages of 12 and 17, the rider's parent/legal guardian must be present to authorize that person to take the flight.</p>
 <p>Dress comfortably. There are canopies on the airplane, but it will be breezy. Long pants are recommended. Closed toe
     shoes are required (no sandals). We will provide a headset so that you can hear the pilot communicate with other air
     traffic and for you to talk to the pilot. You can bring your own aviation headset, if you want.</p>
 
-{% if not hold_harmless %}
-
-<div id="holdHarmlessSection">
-    {{ HH_text}}
-    <span>The rider is the person who must fill out and sign the form. If the rider is between the ages of 12 and 17, the rider's
-        parent/legal guardian must authorize that person to take the flight. If you have trouble with the form or for any reason cannot complete the form before you come to the airport, we
-        will help you complete the form at the airport.</span>
-</div>
-
-{% endif %}
 
 <p>If you have any questions, do not hesitate to call me at 317-584-7852.</p>
 <p style="font-family: Bodoni; font-size: 20px">Keep 'em Flying</p>
