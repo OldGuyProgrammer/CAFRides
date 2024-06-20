@@ -14,6 +14,7 @@ from square.http.auth.o_auth_2 import BearerAuthCredentials
 from square.client import Client
 
 from app import App
+from customer_df import CustomerData
 
 
 def get_customers():
@@ -55,19 +56,37 @@ def get_customers():
         print('get_customers test mode.')
         with open('orders.json', 'r') as orders_json:
             orders_dict = json.load(orders_json)["orders"]
+            fulfillment_dict = {
+                'item_name': [],
+                'variation_name': [],
+                'email_address': [],
+                'phone_number': [],
+                'customer_name': []
+            }
             for order in orders_dict:
-                if 'line_items' in order:
-                    for item in order['line_items']:
-                        print(item['name'])
-                        print(item['variation_name'])
-                if 'fulfillments' in order:
+                if 'fulfillments' in order and 'line_items' in order:
                     for fulfillment in order['fulfillments']:
                         shipment = fulfillment['shipment_details']
                         recipient = shipment['recipient']
                         if 'email_address' in recipient:
-                            print(recipient['email_address'])
+                            fulfillment_dict['email_address'].append(recipient['email_address'])
+                        else:
+                            fulfillment_dict['email_address'].append('')
+
                         if 'phone_number' in recipient:
-                            print(recipient['phone_number'])
+                            fulfillment_dict['phone_number'].append(recipient['phone_number'])
+                        else:
+                            fulfillment_dict['phone_number'].append('')
                         if 'address' in recipient:
                             address = recipient['address']
-                            print(address['first_name'] + ' ' + address['last_name'])
+                            fulfillment_dict['customer_name'].append(address['first_name'] + ' ' + address['last_name'])
+                        else:
+                            fulfillment_dict['customer_name'].append('')
+#        Assume that the first line item has flight information
+                    line_item = order['line_items'][0]
+                    fulfillment_dict['item_name'].append(line_item['name'])
+                    fulfillment_dict['variation_name'].append(line_item['variation_name'])
+
+        df = CustomerData(fulfillment_dict)
+
+    print('Exit get_customers')
