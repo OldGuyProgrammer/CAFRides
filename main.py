@@ -9,7 +9,7 @@
 # Jim Olivi 2024
 
 import argparse
-from app import App
+from app import App, check_params
 from rides import rides
 from get_customers import get_customers
 
@@ -26,15 +26,27 @@ parser.add_argument('-p', '--production', action='store_true',
 parser.add_argument('-l', '--letters', action='store_true',
                     help='Send the emails. If false, query SquareUp for customers.')
 parser.add_argument('-sd', '--start_date',
-                    help='Start date for orders query.')
+                    help='Start date for orders query. Use format mm/dd/yyyy.')
 parser.add_argument('-ed', '--end_date',
-                    help='End date for orders query.')
+                    help='End date for orders query. Use format mm/dd/yyyy. If end date is not specified, only one day will be requested.')
+parser.add_argument('-f', '--orders_csv',
+                    help='Manditory: File name containing orders. This file is where the orders are written to and are read from.')
 
+app = App()
 
 args = parser.parse_args()
 App.production = args.production
 App.UserId = args.userid
 App.password = args.password
+App.orders_file = args.orders_csv
+App.start_date = args.start_date
+if args.end_date is not None:
+    App.end_date = args.end_date
+else:
+    App.end_date = App.start_date
+
+if not check_params():
+    quit()
 
 if App.production:
     print('Production mode selected.')

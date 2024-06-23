@@ -7,17 +7,19 @@
 # Jim Olivi 2024
 
 import pandas as pd
+from app import App
 
 
 class CustomerData:
     def __init__(self, customer_dict):
-        print("Create new customer dictionary.")
+        print("Create new customer orders file.")
 
-        for key, value in customer_dict.items():
-            print(key + ": " + str(value))
         self.customers_df = pd.DataFrame(customer_dict)
 
 
     def __del__(self):
         print('Saving data.')
-        self.customers_df.to_csv('orders.csv', index=False)
+        if not App.orders_file:
+            raise FileNotFoundError('csv file not specified.')
+        self.customers_df.to_csv(App.orders_file, index=False)
+        print('Orders written to: ' + App.orders_file)

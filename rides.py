@@ -21,10 +21,9 @@ from app import App
 
 def rides(database):
 
-    app = App()
     aircraft_df = app.aircraft_df
 
-    print('Enter Rides Class Initializer')
+    print('Enter Rides.')
 
     print('Data contained in: ' + database)
 
@@ -71,6 +70,8 @@ def rides(database):
         now = datetime.datetime.now()
         letter_date = str(now.month) + '/' + str(now.day) + '/' + str(now.year)
         for customer in customer_df.itertuples():
+
+#TODO Add specific time for rider to show up.
             message = MIMEMultipart()
             subject = 'Your upcoming Warbird Ride.'
             message['Subject'] = subject
