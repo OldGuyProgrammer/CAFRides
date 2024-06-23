@@ -5,15 +5,21 @@
 # Jim Olivi 2024
 
 import datetime
-# from time import strptime
+import tkinter.messagebox
 from tkinter import *
-from tkcalendar import Calendar
+from tkcalendar import DateEntry
 import pandas as pd
 
 
 #
 # Make sure the program has enough information to proceed.
 #
+
+def check_date_order(start_date, end_date):
+    if start_date > end_date:
+        return False
+    else:
+        return True
 
 def check_params():
     print('Check CLI commands.')
@@ -27,14 +33,16 @@ def check_params():
             print('invalid dates. Show user calendars.')
             start_date = datetime.datetime.now()
             end_date = start_date
-        if start_date > end_date:
+        if check_date_order(start_date, end_date):
             print('Start date is after the end date.')
             start_date = datetime.datetime.now()
             end_date = start_date
     else:
         start_date = datetime.datetime.now()
         end_date = start_date
-
+    year=start_date.year
+    month=start_date.month
+    day=start_date.day
     root = Tk()
 
     # Set up the main parent window
@@ -46,21 +54,17 @@ def check_params():
     production_checkbox = Checkbutton(root, text=': Production Mode', variable=production_mode, bg='white')
     production_checkbox.grid(column=1, row=0, pady=(10,10))
 
-    year=start_date.year
-    month=start_date.month
-    day=start_date.day
-    start_calendar = Calendar(root, selectmode='day', year=year, month=month, day=day, firstweekday='sunday')
     cal_start_label = Label(text="Start Date")
     cal_start_label.grid(column=1, row=2)
-    start_calendar.grid(column=1, row=3, padx=(4,4))
+    start_date_picker = DateEntry(root, date_pattern='mm/dd/yy')
+    start_date_picker.set_date(start_date)
+    start_date_picker.grid(column=1, row=3)
 
-    year=end_date.year
-    month=end_date.month
-    day=end_date.day
-    end_calendar = Calendar(root, selectmode='day', year=year, month=month, day=day, firstweekday='sunday')
     cal_end_label = Label(text="End Date")
     cal_end_label.grid(column=2, row=2)
-    end_calendar.grid(column=2, row=3, padx=(4,4))
+    end_date_picker = DateEntry(root, date_pattern='mm/dd/yy')
+    end_date_picker.set_date(end_date)
+    end_date_picker.grid(column=2, row=3, padx=(4,4))
 
     # def on_select(event):
     #     idx = event.widget.curselection()[0]
@@ -69,11 +73,26 @@ def check_params():
     #     root.destroy()
     #
     def on_close():
-        print("Exit clicked")
         root.destroy()
 
     # listbox.bind('<<ListboxSelect>>', on_select)
     root.protocol('WM_DELETE_WINDOW', on_close)
+
+    def set_params_button_clicked():
+        App.production = production_mode.get()
+        start = start_date_picker.get_date()
+        end = end_date_picker.get_date()
+        if check_date_order(start, end):
+            App.start_date = start_date_picker.get_date()
+            App.end_date = end_date_picker.get_date()
+            root.destroy()
+        else:
+            msg = 'Start date is after the end date.'
+            print(msg)
+            tkinter.messagebox.showwarning(title='Date Problem', message='Start date must be before end date.')
+
+    set_params_button = Button(root, text="Save All Parameters and get square data", command=set_params_button_clicked)
+    set_params_button.grid(column=2, row=4)
 
     root.mainloop()
     return False

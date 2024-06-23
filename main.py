@@ -45,8 +45,11 @@ if args.end_date is not None:
 else:
     App.end_date = App.start_date
 
-if not check_params():
-    quit()
+print(check_params())
+print(App.production)
+print(App.start_date)
+print(App.end_date)
+quit()
 
 if App.production:
     print('Production mode selected.')
