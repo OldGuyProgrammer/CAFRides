@@ -21,6 +21,7 @@ def check_date_order(start_date, end_date):
     else:
         return True
 
+
 def check_params():
     print('Check CLI commands.')
 
@@ -33,16 +34,14 @@ def check_params():
             print('invalid dates. Show user calendars.')
             start_date = datetime.datetime.now()
             end_date = start_date
-        if check_date_order(start_date, end_date):
+        if not check_date_order(start_date, end_date):
             print('Start date is after the end date.')
             start_date = datetime.datetime.now()
             end_date = start_date
     else:
         start_date = datetime.datetime.now()
         end_date = start_date
-    year=start_date.year
-    month=start_date.month
-    day=start_date.day
+
     root = Tk()
 
     # Set up the main parent window
@@ -73,6 +72,7 @@ def check_params():
     #     root.destroy()
     #
     def on_close():
+        App.abort = True
         root.destroy()
 
     # listbox.bind('<<ListboxSelect>>', on_select)
@@ -95,7 +95,6 @@ def check_params():
     set_params_button.grid(column=2, row=4)
 
     root.mainloop()
-    return False
 
 
 class App:
@@ -108,6 +107,7 @@ class App:
         self.__orders_file = ''
         self.__start_date = None
         self.__end_date = None
+        self.__abort = False
 
         aircraft_file_name = 'aircraft.csv'
         try:
@@ -149,6 +149,17 @@ class App:
     @property
     def end_date(self):
         return self.end_date
+
+    @property
+    def abort(self):
+        if self.__abort:
+            return True
+        else:
+            return False
+
+    @abort.setter
+    def abort(self, flag):
+        self.__abort__ = flag
 
     @start_date.setter
     def start_date(self, date):

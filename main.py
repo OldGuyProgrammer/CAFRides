@@ -45,11 +45,15 @@ if args.end_date is not None:
 else:
     App.end_date = App.start_date
 
+App.abort = False
 print(check_params())
 print(App.production)
 print(App.start_date)
 print(App.end_date)
-quit()
+
+print(App.abort)
+if App.abort:
+    quit()
 
 if App.production:
     print('Production mode selected.')
@@ -57,7 +61,7 @@ else:
     print('Test mode selected.')
 
 if args.letters:
-    rides = rides('Rides_Customers.csv')
+    rides = rides(App.orders_file)
 else:
     get_customers()
 
