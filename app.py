@@ -45,33 +45,41 @@ def check_params():
     root = Tk()
 
     # Set up the main parent window
-    root.geometry("500x300")
+    # root.geometry("500x300")
     root.title('Required Parameters')
 
     production_mode = BooleanVar()
     production_mode.set(bool(App.production))
-    production_checkbox = Checkbutton(root, text=': Production Mode', variable=production_mode, bg='white')
-    production_checkbox.grid(column=1, row=0, pady=(10,10))
+    production_checkbox = Checkbutton(root, text='Production Mode', variable=production_mode)
+    production_checkbox.grid(column=0, row=0, padx=(10,10))
 
     cal_start_label = Label(text="Start Date")
-    cal_start_label.grid(column=1, row=2)
+    cal_start_label.grid(column=0, row=2)
     start_date_picker = DateEntry(root, date_pattern='mm/dd/yy')
     start_date_picker.set_date(start_date)
-    start_date_picker.grid(column=1, row=3)
+    start_date_picker.grid(column=0, row=3)
 
     cal_end_label = Label(text="End Date")
-    cal_end_label.grid(column=2, row=2)
+    cal_end_label.grid(column=1, row=2)
     end_date_picker = DateEntry(root, date_pattern='mm/dd/yy')
     end_date_picker.set_date(end_date)
-    end_date_picker.grid(column=2, row=3, padx=(4,4))
+    end_date_picker.grid(column=1, row=3, padx=(0,10))
 
-    # def on_select(event):
-    #     idx = event.widget.curselection()[0]
-    #     selection = locations_list[idx]
-    #     app.selected_location = selection[1]
-    #     root.destroy()
-    #
+    locations_label = Label(text='Click on desired location.')
+    locations_label.grid(column=0, row=4, pady=(20,2), padx=(10))
+    locations = list(App.locations_names)
+    locations_listbox = Listbox(root, listvariable=StringVar(value=locations))
+    locations_listbox.config(width=0)
+    locations_listbox.grid(column=0, row=5, padx=(10))
+
+    def on_select(event):
+        idx = event.widget.curselection()
+        App.selected_location = locations_listbox.get(idx)
+
+    locations_listbox.bind('<<ListboxSelect>>', on_select)
+
     def on_close():
+        print("Exit before completion requested.")
         App.abort = True
         root.destroy()
 
@@ -89,10 +97,16 @@ def check_params():
         else:
             msg = 'Start date is after the end date.'
             print(msg)
-            tkinter.messagebox.showwarning(title='Date Problem', message='Start date must be before end date.')
+            tkinter.messagebox.showwarning(title='Date Problem', message=msg)
+        if App.selected_location is None:
+            msg = 'Please select a location.'
+            print(msg)
+            tkinter.messagebox.showwarning(title='Select Location', message=msg)
 
-    set_params_button = Button(root, text="Save All Parameters and get square data", command=set_params_button_clicked)
-    set_params_button.grid(column=2, row=4)
+
+    set_params_button = Button(root, text="Save All Parameters and get square data", command=set_params_button_clicked, bg='green', fg='white',
+                               borderwidth=5)
+    set_params_button.grid(column=0, row=6, pady=(10), padx=(4))
 
     root.mainloop()
 
@@ -108,6 +122,9 @@ class App:
         self.__start_date = None
         self.__end_date = None
         self.__abort = False
+        self.__locations_list = None
+        self.__locations_names = None
+        self.__selected_location = None
 
         aircraft_file_name = 'aircraft.csv'
         try:
@@ -122,6 +139,31 @@ class App:
     def get_aircraft(self, aircraft):
         hh_designator = self.aircraft_df.loc[self.aircraft_df['Aircraft'] == aircraft]['HH_Designation'].values[0]
         return hh_designator
+
+
+    @property
+    def selected_location(self):
+        return self.__selected_location
+
+    @selected_location.setter
+    def selected_location(self, loc):
+        self.__selected_location = loc
+
+    @property
+    def locations_list(self):
+        return self.__locations_list
+
+    @property
+    def locations_names(self):
+        return self.__locations_names
+
+    @locations_list.setter
+    def locations_list(self, list):
+        self.__locations_list = list
+
+    @locations_names.setter
+    def locations_names(self, list):
+        self.__locations_names = list
 
     @property
     def production(self):

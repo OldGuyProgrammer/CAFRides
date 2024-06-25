@@ -63,9 +63,15 @@ def get_customers():
     fulfillment_dict = {
         'item_name': [],
         'variation_name': [],
-        'email_address': [],
+        'email': [],
         'phone_number': [],
-        'customer_name': []
+        'customer_name': [],
+        'Airplane': [],
+        'Flight_Date': [],
+        'amount': [],
+        'Hold_Harmless': [],
+        'airport': [],
+        'Send_Email': []
     }
 
     for order in orders_dict:
@@ -91,6 +97,8 @@ def get_customers():
             line_item = order['line_items'][0]
             fulfillment_dict['item_name'].append(line_item['name'])
             fulfillment_dict['variation_name'].append(line_item['variation_name'])
+            fulfillment_dict['Send_Email'] = 'y'
+            fulfillment_dict['Hold_Harmless'] = 'n'
 
         df = CustomerData(fulfillment_dict)
 

@@ -12,6 +12,7 @@ import argparse
 from app import App, check_params
 from rides import rides
 from get_customers import get_customers
+from get_locattions import get_locations
 
 
 print('Start email generator')
@@ -45,13 +46,16 @@ if args.end_date is not None:
 else:
     App.end_date = App.start_date
 
+get_locations()
+
 App.abort = False
+App.selected_location = None
 print(check_params())
 print(App.production)
 print(App.start_date)
 print(App.end_date)
+print(App.selected_location)
 
-print(App.abort)
 if App.abort:
     quit()
 
