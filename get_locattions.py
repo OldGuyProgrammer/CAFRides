@@ -9,12 +9,11 @@
 import json
 import os
 
-from app import App
 from square.http.auth.o_auth_2 import BearerAuthCredentials
 from square.client import Client
 
 
-def get_locations():
+def get_locations(app):
 
     print('Get locations from SquareUp')
 
@@ -33,7 +32,7 @@ def get_locations():
     elif result.is_error():
         raise ConnectionError(result.errors)
 
-    App.locations_list = [(loc['name'], loc['id']) for loc in locations]
-    App.locations_names = [loc['name'] for loc in locations]
+    app.locations_list = [(loc['name'], loc['id']) for loc in locations]
+    app.locations_names = [loc['name'] for loc in locations]
 
     return

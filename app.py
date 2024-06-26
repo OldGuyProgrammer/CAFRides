@@ -9,11 +9,12 @@ import tkinter.messagebox
 from tkinter import *
 from tkcalendar import DateEntry
 import pandas as pd
-
+from get_locattions import get_locations
 
 #
 # Make sure the program has enough information to proceed.
 #
+
 
 def check_date_order(start_date, end_date):
     if start_date > end_date:
@@ -23,7 +24,7 @@ def check_date_order(start_date, end_date):
 
 
 def check_params():
-    print('Check CLI commands.')
+    print('Check CLI parameters.')
 
     if App.start_date is not None:
         # check date formats
@@ -41,6 +42,21 @@ def check_params():
     else:
         start_date = datetime.datetime.now()
         end_date = start_date
+
+    if App.password != '':
+        App.abort = False
+
+    if not App.abort and App.UserId != '':
+        App.abort = False
+
+    if not App.abort and App.orders_file != '':
+        App.abort = False
+# Check required parameters. If messing or in error, display screen.
+
+    if not App.abort:
+        return
+
+    get_locations()
 
     root = Tk()
 
@@ -102,7 +118,6 @@ def check_params():
             msg = 'Please select a location.'
             print(msg)
             tkinter.messagebox.showwarning(title='Select Location', message=msg)
-
 
     set_params_button = Button(root, text="Save All Parameters and get square data", command=set_params_button_clicked, bg='green', fg='white',
                                borderwidth=5)

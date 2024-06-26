@@ -7,6 +7,7 @@
 #
 # Indiana Wing CAF
 # Jim Olivi 2024
+from datetime import datetime
 import json
 import os
 
@@ -28,6 +29,8 @@ def get_customers():
             ),
             environment='production')
 
+        start_date = datetime.strptime(App.start_date, "%m/%d/%y")
+        end_date = datetime.strptime(App.end_date, "%m/%d/%y")
         body = {
             "location_ids": [
                 "L4Z5WSQDM9WSE"
@@ -36,8 +39,8 @@ def get_customers():
                 "filter": {
                     "date_time_filter": {
                         "created_at": {
-                            "start_at": App.start_date,
-                            "end_at": App.end_date
+                            "start_at": start_date,
+                            "end_at": end_date
                         }
                     }
                 }
@@ -67,8 +70,6 @@ def get_customers():
         'phone_number': [],
         'customer_name': [],
         'Airplane': [],
-        'Flight_Date': [],
-        'amount': [],
         'Hold_Harmless': [],
         'airport': [],
         'Send_Email': []
@@ -80,9 +81,9 @@ def get_customers():
                 shipment = fulfillment['shipment_details']
                 recipient = shipment['recipient']
                 if 'email_address' in recipient:
-                    fulfillment_dict['email_address'].append(recipient['email_address'])
+                    fulfillment_dict['email'].append(recipient['email_address'])
                 else:
-                    fulfillment_dict['email_address'].append('')
+                    fulfillment_dict['email'].append('')
 
                 if 'phone_number' in recipient:
                     fulfillment_dict['phone_number'].append(recipient['phone_number'])
@@ -97,9 +98,13 @@ def get_customers():
             line_item = order['line_items'][0]
             fulfillment_dict['item_name'].append(line_item['name'])
             fulfillment_dict['variation_name'].append(line_item['variation_name'])
-            fulfillment_dict['Send_Email'] = 'y'
-            fulfillment_dict['Hold_Harmless'] = 'n'
+            fulfillment_dict['Send_Email'].append('y')
+            fulfillment_dict['Hold_Harmless'].append('n')
+            fulfillment_dict['airport'].append('airport')
+            fulfillment_dict['Airplane'].append('')
 
+        for key, value in fulfillment_dict.items():
+            print(key + "; " + str(len(value)))
         df = CustomerData(fulfillment_dict)
 
     print('Exit get_customers')
